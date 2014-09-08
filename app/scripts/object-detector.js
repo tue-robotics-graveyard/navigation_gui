@@ -21,8 +21,6 @@ var random_color = (function() {
     return random_color;
 })();
 
-var reasoner; // global
-
 $( document ).ready(function() {
 
     var source = $('#objects-template').html();
@@ -48,7 +46,7 @@ $( document ).ready(function() {
        status: 'loading'
     }));
 
-    reasoner = (function() {
+    var reasoner = (function() {
 
         // use the reasoner to get all the locations
         var reasonerService = new ROSLIB.Service({
@@ -90,17 +88,18 @@ $( document ).ready(function() {
     reasoner.query('load_database(~/catkin_ws/src/trunk/tue_knowledge/prolog/locations.pl)', function () {
         reasoner.query('waypoint(A,B)', function (result) {
             //console.log(JSON.stringify(result, null, '\t'));
-            console.log(result);
 
-            result = result.binding_sets.map(function (binding_set) {
-                var bindings = _.findWhere(binding_set.bindings, {variable: 'A'});
-                var str = bindings.value.root.constant.str;
-                return str;
-            });
-
-            result = _.filter(result, function (str) {
-                return str;
-            });
+            result = _.chain(result.binding_sets)
+                .pluck('bindings')
+                .map(function (b) {
+                    return _.findWhere(b, {variable: 'A'});
+                })
+                .pluck('value')
+                .pluck('root')
+                .pluck('constant')
+                .pluck('str')
+                .filter(function (str) { return str; })
+                .value();
 
             var data = generateButtonData(result);
             // generate the buttons
