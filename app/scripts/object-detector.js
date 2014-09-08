@@ -1,3 +1,5 @@
+'use strict';
+
 var random_color = (function() {
     // this is code for generating random colors
     var golden_ratio_conjugate = 0.618033988749895;
@@ -68,7 +70,7 @@ $( document ).ready(function() {
                     callback(result);
                 });
             }
-        }
+        };
 
     })();
 
@@ -96,8 +98,8 @@ $( document ).ready(function() {
                 return str;
             });
 
-            var result = _.filter(result, function (str) {
-                return str != '';
+            result = _.filter(result, function (str) {
+                return str;
             });
 
             var data = generateButtonData(result);
