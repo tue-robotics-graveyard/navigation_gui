@@ -46,7 +46,7 @@
         <div class="navbar navbar-inverse navbar-static-top" role="navigation">
           <div class="container">
             <div class="navbar-header">
-              <a class="navbar-brand" href="#">Live Objects</a>
+              <a class="navbar-brand" href="#">Navigation GUI</a>
             </div>
           </div>
         </div>
@@ -58,11 +58,7 @@
         <script id="objects-template" type="text/x-handlebars-template">
           {{#each this}}
             <button type="button" class="btn btn-lg btn-block"
-                    style="background-color: {{color}};
-                    {{#unless found}}
-                      opacity: .3;
-                    {{/unless}}
-              ">
+                    style="background-color: {{color}};">
               {{name}}
             </button>
           {{else}}
