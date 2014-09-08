@@ -1,12 +1,3 @@
-var color_map = {};
-
-var known_objects = [
-    "kitchen",
-    "door",
-    "cabinet",
-    "wall",
-];
-
 var random_color = (function() {
     // this is code for generating random colors
     var golden_ratio_conjugate = 0.618033988749895;
@@ -28,28 +19,14 @@ var random_color = (function() {
     return random_color;
 })();
 
+var reasoner; // global
+
 $( document ).ready(function() {
 
     var source = $('#objects-template').html();
     var template = Handlebars.compile(source);
 
     var obj_list = $('#objects-list');
-
-    // generate the data for the template
-    var data = known_objects.map(function (o) {
-        var c;
-        if (color_map[o]) {
-            c = color_map[o];
-        } else {
-            c = color_map[o] = random_color();
-        }
-        return {
-            color: c, name: o
-        };
-    });
-
-    // generate the buttons
-    obj_list.html(template(data));
 
     // this is the topic we will publish clicks to
     var trigger = new ROSLIB.Topic({
@@ -65,4 +42,67 @@ $( document ).ready(function() {
         trigger.publish({data:name});
     });
 
+    obj_list.html(template({
+       status: 'loading'
+    }));
+
+    reasoner = (function() {
+
+        // use the reasoner to get all the locations
+        var reasonerService = new ROSLIB.Service({
+            ros : ros,
+            name : '/reasoner/query_srv',
+            serviceType : 'psi/Query'
+        });
+
+        // public API
+        return {
+            query: function (term_string, callback) {
+                var request = new ROSLIB.ServiceRequest({
+                    term: {
+                        term_string: term_string,
+                    },
+                });
+
+                reasonerService.callService(request, function(result) {
+                    callback(result);
+                });
+            }
+        }
+
+    })();
+
+
+    // generate the data for the template
+    function generateButtonData(locations) {
+        return locations.map(function (o) {
+            var c = random_color();
+            return {
+                color: c, name: o
+            };
+        });
+    }
+
+
+
+    reasoner.query('load_database(~/catkin_ws/src/trunk/tue_knowledge/prolog/locations.pl)', function () {
+        reasoner.query('waypoint(A,B)', function (result) {
+            //console.log(JSON.stringify(result, null, '\t'));
+            console.log(result);
+
+            result = result.binding_sets.map(function (binding_set) {
+                var bindings = _.findWhere(binding_set.bindings, {variable: 'A'});
+                var str = bindings.value.root.constant.str;
+                return str;
+            });
+
+            var result = _.filter(result, function (str) {
+                return str != '';
+            });
+
+            var data = generateButtonData(result);
+            // generate the buttons
+            obj_list.html(template(data));
+        });
+    });
 });
