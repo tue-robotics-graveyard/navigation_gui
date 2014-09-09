@@ -204,7 +204,7 @@ $( document ).ready(function() {
 
 
 
-    reasoner.query('load_database(~/catkin_ws/src/trunk/tue_knowledge/prolog/locations.pl)', function () {
+    //reasoner.query('load_database(/home/amigo/ros/groovy/catkin_ws/src/tue/trunk/tue_knowledge/prolog/locations.pl)', function () {
         reasoner.query('waypoint(A,B)', function (result) {
             //console.log(JSON.stringify(result, null, '\t'));
 
@@ -215,14 +215,15 @@ $( document ).ready(function() {
                 })
                 .pluck('value')
                 .pluck('root')
-                .pluck('constant')
-                .pluck('str')
+                .pluck('functor')
                 .filter(function (str) { return str; })
+                .uniq()
                 .value();
+            console.log(result);
 
             var data = generateButtonData(result);
             // generate the buttons
             obj_list.html(template(data));
         });
-    });
+    //});
 });
