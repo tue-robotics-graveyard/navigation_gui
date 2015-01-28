@@ -7,6 +7,5 @@
     "handlebars": "~2.0.0",
     "underscore": "~1.7.0",
     "roslibjs": "develop"
-  },
-  "devDependencies": {}
+  }
 }
