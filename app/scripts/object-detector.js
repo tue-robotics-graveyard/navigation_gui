@@ -36,7 +36,7 @@ $( document ).ready(function() {
   });
 
   inTopic.subscribe(function (msg) {
-    console.log(msg);
+    handleLocations(msg.data.split(','));
   });
 
   // this is the topic we will publish clicks to
@@ -57,6 +57,11 @@ $( document ).ready(function() {
      status: 'loading'
   }));
 
+  function handleLocations (locations) {
+      var data = generateButtonData(locations);
+      obj_list.html(template(data));
+  }
+
   // generate the data for the template
   function generateButtonData(locations) {
     return locations.map(function (o) {
@@ -66,8 +71,4 @@ $( document ).ready(function() {
       };
     });
   }
-
-  var locations = ['asdf', 'omg']
-  var data = generateButtonData(locations);
-  obj_list.html(template(data));
 });
