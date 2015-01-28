@@ -28,10 +28,21 @@ $( document ).ready(function() {
 
     var obj_list = $('#objects-list');
 
-    // this is the topic we will publish clicks to
-    var trigger = new ROSLIB.Topic({
+    // receive list of locations
+    var inTopic = new ROSLIB.Topic({
         ros : ros,
-        name : '/trigger',
+        name : '/locations_list',
+        messageType : 'std_msgs/String'
+    });
+
+    inTopic.subscribe(function (msg) {
+        console.log(msg);
+    });
+
+    // this is the topic we will publish clicks to
+    var outTopic = new ROSLIB.Topic({
+        ros : ros,
+        name : '/nav_goal',
         messageType : 'std_msgs/String'
     });
 
@@ -39,39 +50,12 @@ $( document ).ready(function() {
     obj_list.on('click', 'button', function (e) {
         var name = $(e.currentTarget).html().trim();
         console.log('click', name);
-        trigger.publish({data:name});
+        outTopic.publish({data:name});
     });
 
     obj_list.html(template({
        status: 'loading'
     }));
-
-    var reasoner = (function() {
-
-        // use the reasoner to get all the locations
-        var reasonerService = new ROSLIB.Service({
-            ros : ros,
-            name : '/reasoner/query_srv',
-            serviceType : 'psi/Query'
-        });
-
-        // public API
-        return {
-            query: function (term_string, callback) {
-                var request = new ROSLIB.ServiceRequest({
-                    term: {
-                        term_string: term_string,
-                    },
-                });
-
-                reasonerService.callService(request, function(result) {
-                    callback(result);
-                });
-            }
-        };
-
-    })();
-
 
     // generate the data for the template
     function generateButtonData(locations) {
@@ -83,27 +67,7 @@ $( document ).ready(function() {
         });
     }
 
-
-
-    reasoner.query('load_database(~/catkin_ws/src/trunk/tue_knowledge/prolog/locations.pl)', function () {
-        reasoner.query('waypoint(A,B)', function (result) {
-            //console.log(JSON.stringify(result, null, '\t'));
-
-            result = _.chain(result.binding_sets)
-                .pluck('bindings')
-                .map(function (b) {
-                    return _.findWhere(b, {variable: 'A'});
-                })
-                .pluck('value')
-                .pluck('root')
-                .pluck('constant')
-                .pluck('str')
-                .filter(function (str) { return str; })
-                .value();
-
-            var data = generateButtonData(result);
-            // generate the buttons
-            obj_list.html(template(data));
-        });
-    });
+    var locations = ['asdf', 'omg']
+    var data = generateButtonData(locations);
+    obj_list.html(template(data));
 });
