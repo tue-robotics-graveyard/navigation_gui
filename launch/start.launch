@@ -2,7 +2,7 @@
 <launch>
 
     <remap from="/cmd_vel" to="/amigo/base/references" />
-    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+    <!-- <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" /> -->
 
     <!-- Start the simple webserver to handle static files -->
     <node pkg="navigation_gui" type="webserver.py" name="navigation_gui_webserver" output="screen">
