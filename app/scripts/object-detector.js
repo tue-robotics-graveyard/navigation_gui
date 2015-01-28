@@ -1,5 +1,7 @@
 'use strict';
 
+/* globals ros:true */
+
 var random_color = (function() {
   // this is code for generating random colors
   var golden_ratio_conjugate = 0.618033988749895;

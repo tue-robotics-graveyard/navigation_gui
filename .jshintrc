@@ -1,8 +1,13 @@
 {
+  "globals": {
+    "ROSLIB": true,
+    "Handlebars": true
+  },
+  "devel": true,
   "browser": true,
   "esnext": true,
   "bitwise": true,
-  "camelcase": true,
+  "camelcase": false,
   "curly": true,
   "eqeqeq": true,
   "immed": true,
